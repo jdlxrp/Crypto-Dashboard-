@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  PieChart, Pie, Cell, Tooltip as PieTooltip,
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar
-} from 'recharts';
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#B10DC9"];
+import { TrendingUp, DollarSign, Repeat, AlertCircle } from "lucide-react";
 
 export default function Dashboard() {
   const [prices, setPrices] = useState({});
-  const [history, setHistory] = useState({});
   const [error, setError] = useState(false);
 
   const holdings = {
@@ -41,83 +34,36 @@ export default function Dashboard() {
         setPrices(updated);
       })
       .catch(() => setError(true));
-
-    // Fetch historical data (simulate with mock values)
-    const dummyHistory = [
-      { day: 'Mon', XRP: 0.61, BTC: 70000, ETH: 3200 },
-      { day: 'Tue', XRP: 0.66, BTC: 71500, ETH: 3300 },
-      { day: 'Wed', XRP: 0.70, BTC: 72000, ETH: 3400 },
-      { day: 'Thu', XRP: 0.73, BTC: 73500, ETH: 3500 },
-      { day: 'Fri', XRP: 0.75, BTC: 74000, ETH: 3600 }
-    ];
-    setHistory(dummyHistory);
   }, []);
 
   const formatCurrency = (num) =>
     num?.toLocaleString("en-US", { style: "currency", currency: "USD" }) ?? "—";
 
-  const pieData = Object.entries(holdings).map(([coin, data]) => {
-    const price = prices[coin];
-    return {
-      name: coin,
-      value: parseFloat((price ?? 0) * data.amount)
-    };
-  });
-
-  const barData = Object.entries(holdings).map(([coin, data]) => {
-    const price = prices[coin];
-    const value = data.amount * (price ?? 0);
-    const cost = data.amount * data.cost;
-    const gain = value - cost;
-    return { coin, profit: parseFloat(gain.toFixed(2)) };
-  });
-
   return (
-    <div className="p-4 font-sans max-w-5xl mx-auto">
-      <h1 className="text-xl font-bold mb-2">📊 Portfolio Dashboard</h1>
+    <div style={{ padding: "1rem", fontFamily: "Arial" }}>
+      <h2 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+        <TrendingUp size={20} color="green" /> Portfolio Overview
+      </h2>
+      {Object.entries(holdings).map(([coin, data]) => {
+        const price = prices[coin];
+        const value = data.amount * (price || 0);
+        const cost = data.amount * data.cost;
+        const gain = value - cost;
+        const roi = cost ? (gain / cost) * 100 : 0;
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white p-4 shadow rounded">
-          <h2 className="text-lg font-semibold mb-2">Pie Chart (Value %)</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={70} label>
-                {pieData.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <PieTooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-white p-4 shadow rounded md:col-span-2">
-          <h2 className="text-lg font-semibold mb-2">Line Chart (Sample Price Trend)</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={history}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="XRP" stroke="#8884d8" />
-              <Line type="monotone" dataKey="BTC" stroke="#82ca9d" />
-              <Line type="monotone" dataKey="ETH" stroke="#ffc658" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-white p-4 shadow rounded md:col-span-3">
-          <h2 className="text-lg font-semibold mb-2">Bar Chart (Profit per Coin)</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={barData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="coin" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="profit" fill="#00C49F" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        return (
+          <div key={coin} style={{ marginTop: "1rem" }}>
+            <h3>{coin}</h3>
+            <p>Price: {formatCurrency(price)}</p>
+            <p>Holdings: {data.amount}</p>
+            <p>Value: {formatCurrency(value)}</p>
+            <p>Cost Basis: {formatCurrency(cost)}</p>
+            <p>Gain: {formatCurrency(gain)} ({roi.toFixed(2)}%)</p>
+          </div>
+        );
+      })}
+      <div style={{ marginTop: "1rem", fontSize: "0.85rem", color: "#666" }}>
+        <AlertCircle size={14} color="orange" /> Alerts to: lambert1905@gmail.com
       </div>
     </div>
   );
