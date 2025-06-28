@@ -5,7 +5,11 @@ import {
   PieChart, Pie, Cell, Tooltip as PieTooltip,
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar
-} from "recharts";
+} from "recharts";import ChartSection from './ChartSection';
+
+...
+
+<ChartSection symbol="XRPUSDT" />
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#B10DC9", "#FF69B4", "#6666FF"];
 
